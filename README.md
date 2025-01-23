@@ -18,9 +18,9 @@ optional arguments:
 
   -h, --help            show this help message and exit
   
-  -t TIME, --time, Number of seconds for which script captures packets by default its 10 seconds
+  -t, --time, Number of seconds for which script captures packets by default its 10 seconds
   
-  -c COUNT, --count, Number of packet you want to capture, default is 1000 packets
+  -c,--count, Number of packet you want to capture, default is 1000 packets
 								
   -v, --verbose, give detailed information like TLV will be shown
   
@@ -32,8 +32,7 @@ optional arguments:
   
   -dp, --destination-port, Pass the destination port
   
-  -p , --protocol, Pass the protocol
+  -p, --protocol, Pass the protocol
   
   -vl, --vlan, Pass the vlan ID
 
-</br>
