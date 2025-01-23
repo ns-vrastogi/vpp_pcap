@@ -1,6 +1,6 @@
 # This is the VPP packet capture script. 
 ## We can follow the below steps to run the script
-1. Clont the repository in VPP IPSEC/GRe node using the command.
+1. Clont the git repository in VPP IPSEC/GRE node using the command.
    
    git clone https://github.com/ns-vrastogi/vpp_pcap.git
 2. Go to vpp_pcap directory and make the Python script executable.
