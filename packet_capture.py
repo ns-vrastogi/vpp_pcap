@@ -101,11 +101,11 @@ def configure_capture(seconds, count, Verbose=False ,src_ip=None, dst_ip=None, s
     subprocess.run(del_filter, shell=True)
     time.sleep(2)
     if Verbose:
-        dump_command = f'./src/tcpdump.exe -n -r {name} -vvv'
+        dump_command = f'./src/tcpdump.exe -n -r /tmp/{name} -vvv'
         out= subprocess.run(dump_command, shell=True)
         print(out)
     else:
-        dump_command = f'./tcpdump.exe -n -r {name}'
+        dump_command = f'./tcpdump.exe -n -r /tmp/{name}'
         out = subprocess.run(dump_command, shell=True)
         print(out)
 
