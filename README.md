@@ -1,10 +1,14 @@
 # This is the VPP packet capture script. 
 ## We can run the script below steps. 
 1. Clont the repository using the command.
+   
    git clone https://github.com/ns-vrastogi/vpp_pcap.git
 2. Go to vpp_pcap directory and make the Python script executable.
+   
    chmod +x packet_capture.py
+   
 3. Run the Python script with the required filters.
+   
    python3 packet_capture.py
 
 
