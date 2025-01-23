@@ -18,9 +18,9 @@ optional arguments:
 
   -h, --help            show this help message and exit
   
-  -t TIME, --time, TIME  Number of seconds for which script captures packets by default its 10 seconds
+  -t TIME, --time, Number of seconds for which script captures packets by default its 10 seconds
   
-  -c COUNT, --count, COUNT Number of packet you want to capture, default is 1000 packets
+  -c COUNT, --count, Number of packet you want to capture, default is 1000 packets
 								
   -v, --verbose, give detailed information like TLV will be shown
   
