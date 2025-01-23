@@ -42,6 +42,14 @@ def configure_capture(seconds, count, Verbose=False ,src_ip=None, dst_ip=None, s
     mask = '0' * 96
     mask_filter = '0' * 96
 
+    if src_ip is None and dst_ip is None and src_port is None and dst_port is None and protocol is None and vlan is None:
+        name = pcap_name()
+        command = f'sudo vppctl pcap trace max {count} file {name} rx tx'
+        subprocess.run(command, shell=True)
+        time.sleep(seconds)
+        command3 = f'sudo vppctl pcap trace max {count} file {name} rx tx off'
+        out = subprocess.run(command3, shell=True)
+        subprocess.run(command3, shell=True)
 
     if src_ip:
         print("capturing pcap for source IP")
@@ -100,7 +108,6 @@ def configure_capture(seconds, count, Verbose=False ,src_ip=None, dst_ip=None, s
     del_filter = 'sudo vppctl classify filter pcap delete'
     subprocess.run(del_filter, shell=True)
     time.sleep(2)
-    subprocess.run(['chmod', '+x', 'packet_capture.py'], check=True)
     subprocess.run(['chmod', '+x', 'src/tcpdump.exe'], check=True)
     if Verbose:
         dump_command = f'./src/tcpdump.exe -n -r /tmp/{name} -vvv'
@@ -128,5 +135,3 @@ def main():
 
 
 main()
-
-
