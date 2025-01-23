@@ -24,16 +24,16 @@ optional arguments:
 								
   -v, --verbose, give detailed information like TLV will be shown
   
-  -d DESTINATION_IP, --destination_ip DESTINATION_IP Pass the destination IP
+  -d , --destination_ip,  Pass the destination IP
   
-  -s SOURCE_IP, --source_ip SOURCE_IP Pass the source IP
+  -s, --source_ip, Pass the source IP
   
-  -sp SOURCE_PORT, --source-port SOURCE_PORT Pass the source port
+  -sp, --source-port, Pass the source port
   
-  -dp DESTINATION_PORT, --destination-port DESTINATION_PORT Pass the destination port
+  -dp, --destination-port, Pass the destination port
   
-  -p PROTOCOL, --protocol, PROTOCOL Pass the protocol
+  -p , --protocol, Pass the protocol
   
-  -vl VLAN, --vlan VLAN, Pass the vlan ID
+  -vl, --vlan, Pass the vlan ID
 
 </br>
