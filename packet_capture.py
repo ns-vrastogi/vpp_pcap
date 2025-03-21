@@ -1,9 +1,8 @@
 import argparse
 import subprocess
 import time
-from scapy.layers.inet import IP, UDP, GRE, Ether, TCP, ICMP
-from scapy.all import rdpcap, Raw, wrpcap
 from datetime import datetime
+
 
 
 def pcap_name():
@@ -38,9 +37,12 @@ def protocol_to_hex(proto):
     if proto == 'icmp':
         return '01'
 
-def configure_capture(seconds, count, Verbose=False ,src_ip=None, dst_ip=None, src_port=None, dst_port=None, protocol=None, vlan=None):
-    mask = '0' * 96
-    mask_filter = '0' * 96
+def configure_capture(seconds, count, Verbose=False ,src_ip=None, dst_ip=None, src_port=None, dst_port=None, protocol=None, vlan=None, client_destination=None, client_source=None):
+    mask = '0' * 500
+    mask_filter = '0' * 500
+    mask2 = '0' * 500
+    mask_filter2 = '0' * 500
+
 
     if src_ip is None and dst_ip is None and src_port is None and dst_port is None and protocol is None and vlan is None:
         name = pcap_name()
@@ -93,10 +95,34 @@ def configure_capture(seconds, count, Verbose=False ,src_ip=None, dst_ip=None, s
         mask_filter = mask_filter[:28] + hex_vlan + mask_filter[32:]
         command = f'sudo vppctl classify filter pcap mask hex {mask} match hex {mask_filter}'
 
+    if client_destination:
+        print("capturing pcap for Client destination ip")
+        hex_ip = ip_to_hex(client_destination)
+        mask = mask[:316] + 'f' * 8 + mask[-8:]
+        mask_filter = mask_filter[:316] + hex_ip + mask_filter[-8:]
+        mask2 = mask2[:396] + 'f' * 8 + mask2[-16:]
+        mask_filter2 = mask_filter2[:396] + hex_ip + mask_filter2[-16:]
+        command = f'sudo vppctl classify filter pcap mask hex {mask} match hex {mask_filter}'
+        command10 =f'sudo vppctl classify filter pcap mask hex {mask2} match hex {mask_filter2}'
+
+    if client_source:
+        print("capturing pcap for Client destination ip")
+        hex_ip = ip_to_hex(client_source)
+        mask = mask[:308] + 'f' * 8 + mask[-8:]
+        mask_filter = mask_filter[:308] + hex_ip + mask_filter[-8:]
+        mask2 = mask2[:388] + 'f' * 8 + mask2[-16:]
+        mask_filter2 = mask_filter2[:388] + hex_ip + mask_filter2[-16:]
+        command = f'sudo vppctl classify filter pcap mask hex {mask} match hex {mask_filter}'
+        command10 =f'sudo vppctl classify filter pcap mask hex {mask2} match hex {mask_filter2}'
+
+
 
     name = pcap_name()
     print(command)
+    print(command10)
     subprocess.run(command, shell=True)
+    time.sleep(1)
+    subprocess.run(command10, shell=True)
     time.sleep(1)
     command2 = f'sudo vppctl pcap trace max {count} file {name} rx tx filter'
     subprocess.run(command2, shell=True)
@@ -130,8 +156,10 @@ def main():
     parser.add_argument('-dp', '--destination-port', default=None,help="Pass the destination port")
     parser.add_argument('-p', '--protocol', default=None ,help="Pass the protocol")
     parser.add_argument('-vl', '--vlan',default=None, help="Pass the vlan ID")
+    parser.add_argument('-cd', '--client_destination', default=None, help="Pass the actual client destination IP")
+    parser.add_argument('-cs', '--client_source', default=None, help="Pass the actual client source IP")
     args = (parser.parse_args())
-    configure_capture(args.time, args.count, args.verbose, args.source_ip, args.destination_ip, args.source_port, args.destination_port, args.protocol, args.vlan)
+    configure_capture(args.time, args.count, args.verbose, args.source_ip, args.destination_ip, args.source_port, args.destination_port, args.protocol, args.vlan, args.client_destination, args.client_source)
 
 
 main()
