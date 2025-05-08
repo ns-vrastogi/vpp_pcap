@@ -42,6 +42,11 @@ def configure_capture(seconds, count, Verbose=False ,src_ip=None, dst_ip=None, s
     mask_filter = '0' * 500
     mask2 = '0' * 500
     mask_filter2 = '0' * 500
+    mask3 = '0' * 500
+    mask_filter3 = '0' * 500
+    mask_return = '0' * 500
+    filter_return = '0' * 500
+
 
 
     if src_ip is None and dst_ip is None and src_port is None and dst_port is None and protocol is None and vlan is None:
@@ -102,8 +107,14 @@ def configure_capture(seconds, count, Verbose=False ,src_ip=None, dst_ip=None, s
         mask_filter = mask_filter[:316] + hex_ip + mask_filter[-8:]
         mask2 = mask2[:396] + 'f' * 8 + mask2[-16:]
         mask_filter2 = mask_filter2[:396] + hex_ip + mask_filter2[-16:]
+        mask3 = mask3[:332] + 'f' * 8 + mask3[-16:]
+        mask_filter3 = mask_filter3[:332] + hex_ip + mask_filter3[-16:]
+        mask_return = mask_return[:220] + 'f'* 8 + mask_return[-16:]
+        filter_return = filter_return[:220] + hex_ip + filter_return[-16:]
         command = f'sudo vppctl classify filter pcap mask hex {mask} match hex {mask_filter}'
         command10 =f'sudo vppctl classify filter pcap mask hex {mask2} match hex {mask_filter2}'
+        command11 = f'sudo vppctl classify filter pcap mask hex {mask3} match hex {mask_filter3}'
+        command_return = f'sudo vppctl classify filter pcap mask hex {mask_return} match hex {filter_return}'
 
     if client_source:
         print("capturing pcap for Client destination ip")
@@ -112,21 +123,38 @@ def configure_capture(seconds, count, Verbose=False ,src_ip=None, dst_ip=None, s
         mask_filter = mask_filter[:308] + hex_ip + mask_filter[-8:]
         mask2 = mask2[:388] + 'f' * 8 + mask2[-16:]
         mask_filter2 = mask_filter2[:388] + hex_ip + mask_filter2[-16:]
+        mask3 = mask3[:324] + 'f' * 8 + mask3[-16:]
+        mask_filter3 = mask_filter3[:324] + hex_ip + mask_filter3[-16:]
         command = f'sudo vppctl classify filter pcap mask hex {mask} match hex {mask_filter}'
         command10 =f'sudo vppctl classify filter pcap mask hex {mask2} match hex {mask_filter2}'
+        command11 = f'sudo vppctl classify filter pcap mask hex {mask3} match hex {mask_filter3}'
+        mask_return = mask_return[:228] + 'f'* 8 + mask_return[-16:]
+        filter_return = filter_return[:228] + hex_ip + filter_return[-16:]
+        command_return = f'sudo vppctl classify filter pcap mask hex {mask_return} match hex {filter_return}'
 
 
 
     name = pcap_name()
-    print(command)
-    print(command10)
-    subprocess.run(command, shell=True)
+    try:
+        print(command)
+        print(command10)
+        print(command11)
+        print(command_return)
+        subprocess.run(command, shell=True)
+        time.sleep(1)
+        subprocess.run(command10, shell=True)
+        time.sleep(1)
+        subprocess.run(command11, shell=True)
+        time.sleep(1)
+        subprocess.run(command_return)
+    except:
+        pass
     time.sleep(1)
-    subprocess.run(command10, shell=True)
-    time.sleep(1)
+    print("Starting the Capture now")
     command2 = f'sudo vppctl pcap trace max {count} file {name} rx tx filter'
     subprocess.run(command2, shell=True)
     time.sleep(seconds)
+    print("stopping The Capture Now")
     command3 = f'sudo vppctl pcap trace max {count} file {name} rx tx filer off'
     out = subprocess.run(command3, shell=True)
     print(out)
