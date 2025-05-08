@@ -146,7 +146,7 @@ def configure_capture(seconds, count, Verbose=False ,src_ip=None, dst_ip=None, s
         time.sleep(1)
         subprocess.run(command11, shell=True)
         time.sleep(1)
-        subprocess.run(command_return)
+        subprocess.run(command_return, shell=True)
     except:
         pass
     time.sleep(1)
