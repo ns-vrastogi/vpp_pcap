@@ -37,7 +37,7 @@ def protocol_to_hex(proto):
     if proto == 'icmp':
         return '01'
 
-def configure_capture(seconds, count, Verbose=False ,src_ip=None, dst_ip=None, src_port=None, dst_port=None, protocol=None, vlan=None, client_destination=None, client_source=None):
+def configure_capture(seconds, count, Verbose=False ,src_ip=None, dst_ip=None, src_port=None, dst_port=None, protocol=None, vlan=None, client_destination=None, client_source=None, tunnel=None):
     mask = '0' * 500
     mask_filter = '0' * 500
     mask2 = '0' * 500
@@ -46,7 +46,6 @@ def configure_capture(seconds, count, Verbose=False ,src_ip=None, dst_ip=None, s
     mask_filter3 = '0' * 500
     mask_return = '0' * 500
     filter_return = '0' * 500
-
 
 
     if src_ip is None and dst_ip is None and src_port is None and dst_port is None and protocol is None and vlan is None:
@@ -132,45 +131,59 @@ def configure_capture(seconds, count, Verbose=False ,src_ip=None, dst_ip=None, s
         filter_return = filter_return[:228] + hex_ip + filter_return[-16:]
         command_return = f'sudo vppctl classify filter pcap mask hex {mask_return} match hex {filter_return}'
 
-
+    if tunnel:
+        hex_ip = ip_to_hex(tunnel)
+        mask = mask[:188] + 'f' * 8 + mask[-8:]
+        mask_filter = mask_filter[:188] + hex_ip + mask_filter[-8:]
+        command = f'sudo vppctl classify filter pcap mask hex {mask} match hex {mask_filter}'
 
     name = pcap_name()
     try:
         print(command)
-        print(command10)
-        print(command11)
-        print(command_return)
         subprocess.run(command, shell=True)
-        time.sleep(1)
+    except:
+        pass
+    try:
+        print(command10)
         subprocess.run(command10, shell=True)
-        time.sleep(1)
+    except:
+        pass
+    try:
+        print(command11)
         subprocess.run(command11, shell=True)
-        time.sleep(1)
+    except:
+        pass
+    try:
+        print(command_return)
         subprocess.run(command_return, shell=True)
     except:
         pass
+
     time.sleep(1)
     print("Starting the Capture now")
     command2 = f'sudo vppctl pcap trace max {count} file {name} rx tx filter'
+    print(command2)
     subprocess.run(command2, shell=True)
     time.sleep(seconds)
     print("stopping The Capture Now")
-    command3 = f'sudo vppctl pcap trace max {count} file {name} rx tx filer off'
+    command3 = f'sudo vppctl pcap trace max {count} file {name} rx tx off'
+    print(command3)
     out = subprocess.run(command3, shell=True)
     print(out)
     time.sleep(1)
     del_filter = 'sudo vppctl classify filter pcap delete'
+    print(del_filter)
     subprocess.run(del_filter, shell=True)
     time.sleep(2)
     subprocess.run(['chmod', '+x', 'src/tcpdump.exe'], check=True)
     if Verbose:
-        dump_command = f'./src/tcpdump.exe -n -r /tmp/{name} -vvv'
+        print("Showing first 100 packets")
+        dump_command = f'./src/tcpdump.exe -n -r /tmp/{name} -c 100'
+        print(dump_command)
         out= subprocess.run(dump_command, shell=True)
         print(out)
-    else:
-        dump_command = f'./src/tcpdump.exe -n -r /tmp/{name}'
-        out = subprocess.run(dump_command, shell=True)
-        print(out)
+
+
 
 
 def main():
@@ -178,16 +191,17 @@ def main():
     parser.add_argument('-t', '--time', type=int, default=10, help='Number of seconds for which script captures packets by default its 10 seconds')
     parser.add_argument('-c','--count', type=int, default=1000, help="Number of packet you want to capture, default is 1000 packets")
     parser.add_argument('-v', '--verbose', action='store_true')
-    parser.add_argument('-d', '--destination_ip', default=None,help='Pass the destination IP')
-    parser.add_argument('-s', '--source_ip', default=None,help="Pass the source IP")
+    parser.add_argument('-d', '--destination_ip', default=None,help='Pass the destination IP(This will be public IP address of gateway)')
+    parser.add_argument('-s', '--source_ip', default=None,help="Pass the source IP(This will be public IP address of client)")
     parser.add_argument('-sp', '--source-port', default=None,help="Pass the source port")
     parser.add_argument('-dp', '--destination-port', default=None,help="Pass the destination port")
     parser.add_argument('-p', '--protocol', default=None ,help="Pass the protocol")
     parser.add_argument('-vl', '--vlan',default=None, help="Pass the vlan ID")
     parser.add_argument('-cd', '--client_destination', default=None, help="Pass the actual client destination IP")
     parser.add_argument('-cs', '--client_source', default=None, help="Pass the actual client source IP")
+    parser.add_argument('-tu', '--tunnel', default=None, help="Pass the public IP of tunnel")
     args = (parser.parse_args())
-    configure_capture(args.time, args.count, args.verbose, args.source_ip, args.destination_ip, args.source_port, args.destination_port, args.protocol, args.vlan, args.client_destination, args.client_source)
+    configure_capture(args.time, args.count, args.verbose, args.source_ip, args.destination_ip, args.source_port, args.destination_port, args.protocol, args.vlan, args.client_destination, args.client_source, args.tunnel)
 
 
 main()
