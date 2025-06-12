@@ -175,10 +175,10 @@ def configure_capture(seconds, count, Verbose=False ,src_ip=None, dst_ip=None, s
     print(del_filter)
     subprocess.run(del_filter, shell=True)
     time.sleep(2)
-    subprocess.run(['chmod', '+x', '/usr/local/bin/tcpdump_nsh'], check=True)
+    subprocess.run(['chmod', '+x', 'src/tcpdump.exe'], check=True)
     if Verbose:
         print("Showing first 100 packets")
-        dump_command = f'./usr/local/bin/tcpdump_nsh -n -r /tmp/{name} -c 100'
+        dump_command = f'./src/tcpdump.exe -n -r /tmp/{name} -c 100'
         print(dump_command)
         out= subprocess.run(dump_command, shell=True)
         print(out)
